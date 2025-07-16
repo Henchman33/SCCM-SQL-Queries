@@ -1,1 +1,1 @@
-# SCCM-SQL-Queries
+# SCCM SQL Queries
