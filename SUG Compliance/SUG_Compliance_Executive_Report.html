@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Software Update Group Compliance — Executive Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:        #0b0f1a;
+    --panel:     #111827;
+    --border:    #1e2d45;
+    --accent:    #00d4ff;
+    --accent2:   #7c3aed;
+    --green:     #22c55e;
+    --red:       #ef4444;
+    --yellow:    #f59e0b;
+    --grey:      #64748b;
+    --text:      #e2e8f0;
+    --subtext:   #94a3b8;
+    --card-pad:  28px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND GRID ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 36px 56px 28px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(0,212,255,.06) 0%, transparent 100%);
+  }
+
+  .logo-block { display: flex; align-items: center; gap: 18px; }
+  .logo-icon {
+    width: 52px; height: 52px;
+    border: 2px solid var(--accent);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 24px rgba(0,212,255,.3);
+  }
+  .logo-icon svg { width: 28px; height: 28px; }
+
+  .logo-text h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .logo-text p {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--subtext);
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .report-meta { text-align: right; }
+  .report-meta .label { font-size: 10px; letter-spacing: 2px; color: var(--subtext); text-transform: uppercase; }
+  .report-meta .value { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text); margin-top: 2px; }
+
+  /* ── PAGE TITLE ── */
+  .page-title {
+    position: relative; z-index: 1;
+    padding: 48px 56px 0;
+  }
+  .page-title .eyebrow {
+    font-size: 11px; letter-spacing: 3px; color: var(--accent);
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .page-title h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(38px, 5vw, 64px);
+    letter-spacing: 2px;
+    line-height: 1;
+    color: var(--text);
+  }
+  .page-title h2 span { color: var(--accent); }
+  .page-title .subtitle {
+    margin-top: 12px;
+    font-size: 14px;
+    color: var(--subtext);
+    max-width: 580px;
+    line-height: 1.6;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  main {
+    position: relative; z-index: 1;
+    padding: 40px 56px 64px;
+  }
+
+  /* ── KPI STRIP ── */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .kpi-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--card-pad);
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s, border-color .2s;
+  }
+  .kpi-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent-bar, var(--accent));
+  }
+
+  .kpi-card.green  { --accent-bar: var(--green); }
+  .kpi-card.red    { --accent-bar: var(--red); }
+  .kpi-card.yellow { --accent-bar: var(--yellow); }
+  .kpi-card.grey   { --accent-bar: var(--grey); }
+
+  .kpi-label {
+    font-size: 10px; letter-spacing: 2px;
+    color: var(--subtext); text-transform: uppercase; margin-bottom: 14px;
+  }
+  .kpi-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px; line-height: 1;
+    color: var(--text);
+  }
+  .kpi-value.pct { color: var(--accent); }
+  .kpi-value.green  { color: var(--green); }
+  .kpi-value.red    { color: var(--red); }
+  .kpi-value.yellow { color: var(--yellow); }
+  .kpi-delta {
+    margin-top: 8px; font-size: 11px; color: var(--subtext);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px;
+  }
+  .section-header h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px; letter-spacing: 2px; color: var(--text);
+  }
+  .section-header .badge {
+    padding: 3px 10px;
+    background: rgba(0,212,255,.12);
+    border: 1px solid rgba(0,212,255,.3);
+    border-radius: 20px;
+    font-size: 10px; letter-spacing: 1px;
+    color: var(--accent); text-transform: uppercase;
+  }
+
+  /* ── TWO-COL LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px; }
+
+  /* ── CHART CARD ── */
+  .chart-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--card-pad);
+  }
+  .chart-card .card-title {
+    font-size: 11px; letter-spacing: 2px;
+    color: var(--subtext); text-transform: uppercase; margin-bottom: 24px;
+  }
+
+  /* Donut chart */
+  .donut-wrap {
+    display: flex; align-items: center; gap: 28px;
+  }
+  .donut-svg { flex-shrink: 0; }
+  .donut-legend { display: flex; flex-direction: column; gap: 10px; }
+  .legend-row { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .legend-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+  .legend-label { color: var(--subtext); flex: 1; }
+  .legend-val { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text); }
+
+  /* Horizontal bar chart */
+  .bar-chart { display: flex; flex-direction: column; gap: 14px; }
+  .bar-row { display: grid; grid-template-columns: 180px 1fr 52px; align-items: center; gap: 12px; }
+  .bar-name { font-size: 12px; color: var(--subtext); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track {
+    background: rgba(255,255,255,.06);
+    border-radius: 4px; height: 8px; overflow: hidden;
+  }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+  .bar-pct { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text); text-align: right; }
+
+  /* ── MAIN TABLE ── */
+  .table-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 40px;
+  }
+  .table-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-toolbar .t-title {
+    font-size: 11px; letter-spacing: 2px;
+    color: var(--subtext); text-transform: uppercase;
+  }
+  .table-toolbar .t-note {
+    font-size: 11px; color: var(--grey);
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 12px 18px;
+    font-size: 10px; letter-spacing: 2px;
+    color: var(--subtext); text-transform: uppercase;
+    text-align: left;
+    background: rgba(255,255,255,.03);
+    border-bottom: 1px solid var(--border);
+  }
+  thead th:last-child { text-align: center; }
+  tbody tr { border-bottom: 1px solid rgba(255,255,255,.04); transition: background .15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(0,212,255,.04); }
+  tbody td { padding: 14px 18px; font-size: 13px; }
+
+  .td-group { font-weight: 600; color: var(--text); }
+  .td-coll  { color: var(--subtext); font-size: 12px; }
+  .td-mono  { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--subtext); }
+
+  .pill {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 500; letter-spacing: .5px;
+  }
+  .pill-green  { background: rgba(34,197,94,.15);  color: var(--green);  border: 1px solid rgba(34,197,94,.3); }
+  .pill-red    { background: rgba(239,68,68,.15);  color: var(--red);   border: 1px solid rgba(239,68,68,.3); }
+  .pill-yellow { background: rgba(245,158,11,.15); color: var(--yellow); border: 1px solid rgba(245,158,11,.3); }
+  .pill-grey   { background: rgba(100,116,139,.15);color: var(--grey);  border: 1px solid rgba(100,116,139,.3); }
+
+  /* Compliance bar cell */
+  .comp-cell { display: flex; align-items: center; gap: 10px; }
+  .comp-bar-track {
+    flex: 1; height: 6px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden;
+  }
+  .comp-bar-fill { height: 100%; border-radius: 3px; }
+  .comp-pct { font-family: 'DM Mono', monospace; font-size: 12px; min-width: 42px; text-align: right; }
+
+  /* ── RISK CALLOUT ── */
+  .risk-section { margin-bottom: 40px; }
+  .risk-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+  .risk-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    border-left: 3px solid var(--red);
+  }
+  .risk-card.warn { border-left-color: var(--yellow); }
+  .risk-card .r-title { font-weight: 600; font-size: 13px; color: var(--text); margin-bottom: 6px; }
+  .risk-card .r-body { font-size: 12px; color: var(--subtext); line-height: 1.6; }
+  .risk-card .r-stat {
+    margin-top: 10px;
+    font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 700;
+    color: var(--red);
+  }
+  .risk-card.warn .r-stat { color: var(--yellow); }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 1;
+    padding: 24px 56px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; color: var(--grey);
+    letter-spacing: .5px;
+  }
+  footer .f-brand { font-family: 'DM Mono', monospace; color: var(--accent); }
+
+  @media print {
+    body { background: #fff; color: #111; }
+    body::before { display: none; }
+    .kpi-card, .chart-card, .table-card, .risk-card { border: 1px solid #ddd; background: #fafafa; }
+    .kpi-value, .page-title h2 span { color: #0070a8; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="logo-block">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2"/>
+        <path d="M8 21h8M12 17v4"/>
+        <path d="M7 8l3 3 5-5"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <h1>MECM Compliance</h1>
+      <p>Microsoft Endpoint Configuration Manager</p>
+    </div>
+  </div>
+  <div class="report-meta">
+    <div class="label">Report Generated</div>
+    <div class="value" id="rptDate"></div>
+    <div class="label" style="margin-top:10px;">Classification</div>
+    <div class="value">Internal — Executive Use</div>
+  </div>
+</header>
+
+<!-- ── TITLE ── -->
+<div class="page-title">
+  <div class="eyebrow">▸ Patch Compliance Dashboard</div>
+  <h2>Software Update Group<br/><span>Compliance Report</span></h2>
+  <p class="subtitle">
+    Enterprise-wide summary of Software Update Group deployment compliance across all managed
+    collections. Data sourced directly from the MECM SQL database via v_UpdateComplianceStatus.
+  </p>
+</div>
+
+<!-- ── MAIN ── -->
+<main>
+
+  <!-- KPI Strip -->
+  <div class="kpi-strip">
+    <div class="kpi-card">
+      <div class="kpi-label">Update Groups</div>
+      <div class="kpi-value" id="kpiGroups">—</div>
+      <div class="kpi-delta">Deployed deployments</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total Devices</div>
+      <div class="kpi-value" id="kpiDevices">—</div>
+      <div class="kpi-delta">Active CM-managed</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Compliant</div>
+      <div class="kpi-value green" id="kpiCompliant">—</div>
+      <div class="kpi-delta" id="kpiCompliantPct"></div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Non-Compliant</div>
+      <div class="kpi-value red" id="kpiNonCompliant">—</div>
+      <div class="kpi-delta" id="kpiNonCompliantPct"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Overall Compliance</div>
+      <div class="kpi-value pct" id="kpiOverall">—</div>
+      <div class="kpi-delta">Compliant / Required</div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="two-col" style="margin-bottom:40px;">
+
+    <!-- Donut -->
+    <div class="chart-card">
+      <div class="card-title">Compliance State Distribution</div>
+      <div class="donut-wrap">
+        <svg class="donut-svg" id="donutSvg" width="160" height="160" viewBox="0 0 160 160"></svg>
+        <div class="donut-legend" id="donutLegend"></div>
+      </div>
+    </div>
+
+    <!-- Bar per group -->
+    <div class="chart-card">
+      <div class="card-title">Compliance % by Update Group</div>
+      <div class="bar-chart" id="groupBars"></div>
+    </div>
+
+  </div>
+
+  <!-- Main Table -->
+  <div class="section-header">
+    <h3>Update Group Detail</h3>
+    <span class="badge">Per-Group Breakdown</span>
+  </div>
+  <div class="table-card">
+    <div class="table-toolbar">
+      <span class="t-title">All Deployed Software Update Groups</span>
+      <span class="t-note">Sorted: lowest compliance first</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Update Group</th>
+          <th>Collection</th>
+          <th>Deadline (UTC)</th>
+          <th>Total</th>
+          <th>Compliant</th>
+          <th>Non-Compliant</th>
+          <th>Not Required</th>
+          <th>Unknown</th>
+          <th style="text-align:center;">Compliance %</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="mainTbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Risk Section -->
+  <div class="risk-section">
+    <div class="section-header">
+      <h3>Risk &amp; Action Items</h3>
+      <span class="badge">Attention Required</span>
+    </div>
+    <div class="risk-grid" id="riskGrid"></div>
+  </div>
+
+</main>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <span>MECM Software Update Group Compliance — Executive Report &nbsp;|&nbsp; <span class="f-brand">Internal Use Only</span></span>
+  <span id="footerDate"></span>
+</footer>
+
+<!-- ══════════════════════════════════════════
+     DATA SECTION – Replace with real SQL results
+     ══════════════════════════════════════════ -->
+<script>
+/* -------------------------------------------------------
+   SAMPLE DATA — replace rows[] with your SQL query output
+   Fields match the first SELECT in SUG_Compliance_Query.sql
+   ------------------------------------------------------- */
+const rows = [
+  { group: "2024-Q4 Security Updates",      collection: "All Workstations",       deadline: "2024-11-12 02:00", total: 1420, compliant: 1380, nonCompliant: 28,  notRequired: 8,   unknown: 4  },
+  { group: "2024-Q4 Server Patches",        collection: "All Production Servers",  deadline: "2024-11-19 02:00", total: 320,  compliant: 288,  nonCompliant: 22,  notRequired: 5,   unknown: 5  },
+  { group: "2025-01 Critical Rollup",       collection: "All Managed Devices",     deadline: "2025-01-21 02:00", total: 1740, compliant: 1512, nonCompliant: 186, notRequired: 32,  unknown: 10 },
+  { group: "2025-02 Zero-Day Emergency",    collection: "All Managed Devices",     deadline: "2025-02-06 02:00", total: 1740, compliant: 924,  nonCompliant: 742, notRequired: 60,  unknown: 14 },
+  { group: "2025-03 Cumulative Update",     collection: "All Workstations",        deadline: "2025-03-18 02:00", total: 1420, compliant: 1398, nonCompliant: 14,  notRequired: 6,   unknown: 2  },
+  { group: "2025-03 Server Baseline",       collection: "All Production Servers",  deadline: "2025-03-25 02:00", total: 320,  compliant: 305,  nonCompliant: 12,  notRequired: 2,   unknown: 1  },
+  { group: "2025-04 Patch Tuesday",         collection: "All Managed Devices",     deadline: "2025-04-15 02:00", total: 1740, compliant: 1140, nonCompliant: 530, notRequired: 55,  unknown: 15 },
+  { group: "Office 365 – Apr 2025",         collection: "Office 365 Clients",      deadline: "2025-04-22 02:00", total: 1100, compliant: 1067, nonCompliant: 28,  notRequired: 3,   unknown: 2  },
+  { group: "Edge Browser Rollup",           collection: "All Workstations",        deadline: "2025-04-29 02:00", total: 1420, compliant: 1390, nonCompliant: 22,  notRequired: 4,   unknown: 4  },
+  { group: "2025-05 Patch Tuesday",         collection: "All Managed Devices",     deadline: "2025-05-13 02:00", total: 1740, compliant: 180,  nonCompliant: 1460,notRequired: 68,  unknown: 32 },
+];
+
+/* -------------------------------------------------------
+   RENDER ENGINE
+   ------------------------------------------------------- */
+const fmt = n => n.toLocaleString();
+
+function compliance(r) {
+  const required = r.compliant + r.nonCompliant;
+  return required === 0 ? 100 : +(100 * r.compliant / required).toFixed(1);
+}
+
+function statusPill(pct) {
+  if (pct >= 95) return '<span class="pill pill-green">Compliant</span>';
+  if (pct >= 75) return '<span class="pill pill-yellow">At Risk</span>';
+  return '<span class="pill pill-red">Critical</span>';
+}
+
+function barColor(pct) {
+  if (pct >= 95) return 'var(--green)';
+  if (pct >= 75) return 'var(--yellow)';
+  return 'var(--red)';
+}
+
+/* Set report date */
+const now = new Date();
+const dateStr = now.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+document.getElementById('rptDate').textContent = dateStr;
+document.getElementById('footerDate').textContent = `Generated ${dateStr}`;
+
+/* KPIs */
+const totalDevicesAll = [...new Set(rows.map(r => r.group))].length; // unique groups
+const allTotal      = rows.reduce((a,r) => a + r.total, 0) / rows.length | 0; // avg per group (placeholder)
+const sumCompliant    = rows.reduce((a,r) => a + r.compliant, 0);
+const sumNonCompliant = rows.reduce((a,r) => a + r.nonCompliant, 0);
+const sumNotRequired  = rows.reduce((a,r) => a + r.notRequired, 0);
+const sumUnknown      = rows.reduce((a,r) => a + r.unknown, 0);
+const sumRequired     = sumCompliant + sumNonCompliant;
+const overallPct      = sumRequired === 0 ? 100 : +(100 * sumCompliant / sumRequired).toFixed(1);
+
+document.getElementById('kpiGroups').textContent      = rows.length;
+document.getElementById('kpiDevices').textContent     = fmt(sumCompliant + sumNonCompliant + sumNotRequired + sumUnknown);
+document.getElementById('kpiCompliant').textContent   = fmt(sumCompliant);
+document.getElementById('kpiCompliantPct').textContent = `${overallPct}% of required`;
+document.getElementById('kpiNonCompliant').textContent = fmt(sumNonCompliant);
+document.getElementById('kpiNonCompliantPct').textContent = `${+(100 * sumNonCompliant / sumRequired).toFixed(1)}% of required`;
+document.getElementById('kpiOverall').textContent     = overallPct + '%';
+
+/* ── DONUT ── */
+(function() {
+  const data = [
+    { label: 'Compliant',    value: sumCompliant,    color: 'var(--green)'  },
+    { label: 'Non-Compliant',value: sumNonCompliant, color: 'var(--red)'    },
+    { label: 'Not Required', value: sumNotRequired,  color: 'var(--grey)'   },
+    { label: 'Unknown',      value: sumUnknown,      color: 'var(--yellow)' },
+  ];
+  const total = data.reduce((a,d) => a + d.value, 0);
+  const cx = 80, cy = 80, r = 62, ir = 40;
+  let startAngle = -Math.PI / 2;
+  let paths = '';
+
+  data.forEach(d => {
+    const angle = (d.value / total) * 2 * Math.PI;
+    const endAngle = startAngle + angle;
+    const x1 = cx + r * Math.cos(startAngle), y1 = cy + r * Math.sin(startAngle);
+    const x2 = cx + r * Math.cos(endAngle),   y2 = cy + r * Math.sin(endAngle);
+    const ix1 = cx + ir * Math.cos(startAngle), iy1 = cy + ir * Math.sin(startAngle);
+    const ix2 = cx + ir * Math.cos(endAngle),   iy2 = cy + ir * Math.sin(endAngle);
+    const large = angle > Math.PI ? 1 : 0;
+    paths += `<path d="M ${ix1} ${iy1} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${ir} ${ir} 0 ${large} 0 ${ix1} ${iy1} Z" fill="${d.color}" opacity="0.9"/>`;
+    startAngle = endAngle;
+  });
+
+  // center text
+  paths += `<text x="${cx}" y="${cy-8}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="26" fill="#e2e8f0">${overallPct}%</text>`;
+  paths += `<text x="${cx}" y="${cy+12}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#94a3b8" letter-spacing="1">COMPLIANT</text>`;
+
+  document.getElementById('donutSvg').innerHTML = paths;
+
+  const legend = document.getElementById('donutLegend');
+  data.forEach(d => {
+    const pct = total ? (100*d.value/total).toFixed(1) : 0;
+    legend.innerHTML += `<div class="legend-row">
+      <div class="legend-dot" style="background:${d.color}"></div>
+      <span class="legend-label">${d.label}</span>
+      <span class="legend-val">${fmt(d.value)} <span style="color:var(--grey)">(${pct}%)</span></span>
+    </div>`;
+  });
+})();
+
+/* ── GROUP BARS ── */
+(function() {
+  const sorted = [...rows].sort((a,b) => compliance(a) - compliance(b));
+  const container = document.getElementById('groupBars');
+  sorted.forEach(r => {
+    const pct = compliance(r);
+    const color = barColor(pct);
+    const shortName = r.group.length > 26 ? r.group.substring(0,24)+'…' : r.group;
+    container.innerHTML += `<div class="bar-row">
+      <div class="bar-name" title="${r.group}">${shortName}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="bar-pct" style="color:${color}">${pct}%</div>
+    </div>`;
+  });
+})();
+
+/* ── MAIN TABLE ── */
+(function() {
+  const sorted = [...rows].sort((a,b) => compliance(a) - compliance(b));
+  const tbody = document.getElementById('mainTbody');
+  sorted.forEach(r => {
+    const pct = compliance(r);
+    const color = barColor(pct);
+    tbody.innerHTML += `<tr>
+      <td class="td-group">${r.group}</td>
+      <td class="td-coll">${r.collection}</td>
+      <td class="td-mono">${r.deadline}</td>
+      <td class="td-mono">${fmt(r.total)}</td>
+      <td style="color:var(--green);font-family:'DM Mono',monospace;font-size:13px">${fmt(r.compliant)}</td>
+      <td style="color:var(--red);font-family:'DM Mono',monospace;font-size:13px">${fmt(r.nonCompliant)}</td>
+      <td class="td-mono">${fmt(r.notRequired)}</td>
+      <td style="color:var(--yellow);font-family:'DM Mono',monospace;font-size:13px">${fmt(r.unknown)}</td>
+      <td>
+        <div class="comp-cell">
+          <div class="comp-bar-track">
+            <div class="comp-bar-fill" style="width:${pct}%;background:${color}"></div>
+          </div>
+          <span class="comp-pct" style="color:${color}">${pct}%</span>
+        </div>
+      </td>
+      <td>${statusPill(pct)}</td>
+    </tr>`;
+  });
+})();
+
+/* ── RISK CALLOUTS ── */
+(function() {
+  const critical = rows.filter(r => compliance(r) < 75);
+  const atRisk   = rows.filter(r => compliance(r) >= 75 && compliance(r) < 95);
+  const unknownHigh = rows.filter(r => r.unknown > 10);
+  const grid = document.getElementById('riskGrid');
+
+  if (critical.length) {
+    grid.innerHTML += `<div class="risk-card">
+      <div class="r-title">🔴 Critical Groups</div>
+      <div class="r-body">${critical.map(r => `<b>${r.group}</b>`).join(', ')} — below 75% compliance. Immediate remediation recommended.</div>
+      <div class="r-stat">${critical.length} group${critical.length>1?'s':''}</div>
+    </div>`;
+  }
+
+  if (atRisk.length) {
+    grid.innerHTML += `<div class="risk-card warn">
+      <div class="r-title">🟡 At-Risk Groups</div>
+      <div class="r-body">${atRisk.map(r => `<b>${r.group}</b>`).join(', ')} — between 75–95%. Monitoring and targeted follow-up advised.</div>
+      <div class="r-stat">${atRisk.length} group${atRisk.length>1?'s':''}</div>
+    </div>`;
+  }
+
+  if (unknownHigh.length) {
+    grid.innerHTML += `<div class="risk-card warn">
+      <div class="r-title">⚠️ High Unknown State</div>
+      <div class="r-body">${unknownHigh.map(r => `<b>${r.group}</b> (${r.unknown} devices)`).join(', ')} — clients may not be reporting. Investigate CM client health.</div>
+      <div class="r-stat">${unknownHigh.reduce((a,r)=>a+r.unknown,0)} devices</div>
+    </div>`;
+  }
+
+  if (!grid.children.length) {
+    grid.innerHTML = `<div class="risk-card" style="border-left-color:var(--green);grid-column:1/-1">
+      <div class="r-title">✅ No Critical Risks Detected</div>
+      <div class="r-body">All update groups are at or above the 75% compliance threshold. Continue regular patching cadence.</div>
+    </div>`;
+  }
+})();
+</script>
+</body>
+</html>
